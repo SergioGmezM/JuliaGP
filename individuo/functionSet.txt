@@ -1,0 +1,6 @@
++ + 2 true
+- - 2 false
+* * 2 true
+/ / 2 false
+sqrt sqrt 1 true
+pow ^ 2 false
