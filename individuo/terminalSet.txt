@@ -3,4 +3,4 @@ var y Float64 -5.3
 var z Float64 4.7
 const Float64 -3.82
 const Float64 4.3
-func random rand
+func random rand Float64

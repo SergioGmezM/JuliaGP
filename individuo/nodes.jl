@@ -6,23 +6,39 @@ abstract type Node end
 #   func: the actual function that will be executed for that function node.
 #   arity: the number of parameters for the function, also, the number of
 #   children of the function node.
+#   sentence: determines wether the function is a statement or an expression.
+#   returnType: type of the returning value of a function.
+#   argTypes: types of the arguments of the function.
 struct FunctionNode <: Node
     symbol::AbstractString
     func::Symbol
     arity::Int8
     conmutative::Bool
+    sentence::AbstractString
+    returnType::AbstractString
+    argTypes::Array{AbstractString}
 
-    FunctionNode(symbol, func, arity, conmutative) = arity > 0 ? new(symbol, func, arity, conmutative) : error("A function with no arguments is not a function node: $symbol")
+    function FunctionNode(symbol, func, arity, conmutative, sentence, returnType, argTypes)
+
+        if arity <= 0
+            error("Could not create FunctionNode instance: $symbol")
+        end
+
+        new(symbol, func, arity, conmutative, sentence, returnType, argTypes)
+    end
 end # struct FunctionNode
 
 # Second constructor of FunctionNode struct.
-FunctionNode(symbol, func, arity) = FunctionNode(symbol, func, arity, true)
+FunctionNode(symbol, func, arity, conmutative) = FunctionNode(symbol, func, arity, conmutative, "", "", Array{AbstractString}(undef, 0))
 
 # Gets the arity of a given function node.
 getArity(node::FunctionNode) = node.arity
 
 # Checks if the operation is conmutative.
 isConmutative(node::FunctionNode) = node.conmutative
+
+# Gets the return type of a function node
+getReturnType(node::FunctionNode) = node.returnType
 
 # Executes the function of the function node.
 eval(node::FunctionNode, arg, args...) = eval(node.func)(arg, args...)
@@ -49,25 +65,39 @@ end # struct ConstantNode
 # and it's considered as a terminal node in the expression tree.
 #   symbol: identifier of the function.
 #   func: the actual function that will be executed for that terminal node.
+#   returnType: type of the returning value of the function.
 struct NoArgsFunctionNode <: TerminalNode
     symbol::AbstractString
     func::Symbol
+    returnType::AbstractString
 end # struct NoArgsFunctionNode
 
+# Second constructor of NoArgsFunctionNode struct.
+NoArgsFunctionNode(symbol, func) = NoArgsFunctionNode(symbol, func, "nothing")
+
 # Gets the value of the terminal node or executes the 0 arity-function of the node.
-function eval(x::TerminalNode)
-    if typeof(x) == NoArgsFunctionNode
-        eval(x.func)()
+function eval(node::TerminalNode)
+    if typeof(node) == NoArgsFunctionNode
+        eval(node.func)()
     else
-        x.value
+        node.value
     end
 end
 
 # Gets the identifier of the node.
-function getSymbol(x::Node)
-    if typeof(x) == ConstantNode
-        x.value
+function getSymbol(node::Node)
+    if typeof(node) == ConstantNode
+        node.value
     else
-        x.symbol
+        node.symbol
+    end
+end
+
+# Gets the type of the node.
+function getType(node::Node)
+    if typeof(node) == FunctionNode || typeof(node) == NoArgsFunctionNode
+        node.returnType
+    else
+        typeof(node.value)
     end
 end
