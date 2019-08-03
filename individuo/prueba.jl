@@ -22,7 +22,7 @@ function myFunction(fitness::Fitness, individual::String)::Float64
     return result
 end
 
-gen = Generator(50, 3, "grow") # Creamos el generador de la población
+gen = Generator(50, 3, "RHH", 0.6) # Creamos el generador de la población
 fitness = Fitness((50.0,), (-1,)) # Creamos el fitness que utilizará el sistema
 ev = Evaluator(fitness, myFunction) # Creamos el evaluador del sistema con nuestra función de evaluación
 
