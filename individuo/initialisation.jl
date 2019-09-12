@@ -1,12 +1,12 @@
 include("nodes.jl") # For Node structs.
 
 # Generator represents the way that a population is going to be generated.
-# pop_size: size of the population, number of individuals.
-# max_d: maximun depth of the individuals in the population.
-# method: method used for generating the individuals.
-# RHH_factor: when using Ramped Half-Half initialisation, this is the
-# pertentage of trees generated using full method, 1-RHH_factor will be the
-# percentage of trees generated using grow method.
+#   pop_size: size of the population, number of individuals.
+#   max_d: maximun depth of the individuals in the population.
+#   method: method used for generating the individuals.
+#   RHH_factor: when using Ramped Half-Half initialisation, this is the
+#   pertentage of trees generated using full method, 1-RHH_factor will be the
+#   percentage of trees generated using grow method.
 struct Generator
     pop_size::Int
     max_d::Int
@@ -39,7 +39,7 @@ getFactor(gen::Generator) = gen.RHH_factor
 
 # Generates a tree of depth max_d using either full or grow methods given
 # the function set and the terminal set.
-function gen_rnd_expr(gen::Generator, functionSet::Array{FunctionNode}, terminalSet::Array{TerminalNode}, max_d::Int)
+"""function gen_rnd_expr(gen::Generator, functionSet::Array{FunctionNode}, terminalSet::Array{TerminalNode}, max_d::Int)
 
     expr = Array{Node}(undef, 0)
     prob = length(terminalSet)/(length(terminalSet) + length(functionSet))
@@ -60,7 +60,7 @@ function gen_rnd_expr(gen::Generator, functionSet::Array{FunctionNode}, terminal
     end
 
     return expr
-end
+end"""
 
 # Generates a tree of depth max_d using grow method given
 # the function set and the terminal set.

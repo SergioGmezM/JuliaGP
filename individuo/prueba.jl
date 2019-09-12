@@ -1,6 +1,6 @@
 include("JuliaGP.jl")
 
-include("functions.jl")
+include("functions.jl") # Fichero donde se definen las funciones del usuario.
 
 # Se define la función de fitness que utilizará el sistema
 # la función siempre debe recibir como argumentos el objeto Fitness
