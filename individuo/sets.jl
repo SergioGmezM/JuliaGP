@@ -29,12 +29,15 @@ function setFunctionSet(filename::AbstractString)
         symbol = String(fields[1])
         func = String(fields[2])
         arity = parse(Int, fields[3])
+        fields[4] == "true" ? conmutative = true : conmutative = false
 
-        if length(fields) == 4
-            fields[4] == "true" ? conmutative = true : conmutative = false
-            push!(functionSet, FunctionNode(symbol, Symbol(func), arity, conmutative))
+        if length(fields) > 4
+            sentence = String(fields[5])
+            returnType = String(fields[6])
+            argTypes = fields[7:(6+arity)]
+            push!(functionSet, FunctionNode(symbol, Symbol(func), arity, conmutative, sentence, returnType, argTypes))
         else
-            push!(functionSet, FunctionNode(symbol, Symbol(func), arity))
+            push!(functionSet, FunctionNode(symbol, Symbol(func), arity, conmutative))
         end
     end
 
@@ -69,8 +72,13 @@ function setTerminalSet(filename::AbstractString)
         elseif fields[1] == "func" # NoArgsFunctionNode
             symbol = String(fields[2])
             func = String(fields[3])
-            push!(terminalSet, NoArgsFunctionNode(symbol, Symbol(func)))
 
+            if length(fields) > 3
+                returnType = String(fields[4])
+                push!(terminalSet, NoArgsFunctionNode(symbol, Symbol(func), returnType))
+            else
+                push!(terminalSet, NoArgsFunctionNode(symbol, Symbol(func)))
+            end
         else
             @warn "Type of terminal node not supported: $(fields[1])"
         end
