@@ -60,7 +60,7 @@ getFactor(gen::Generator) = gen.RHH_factor
     end
 
     return expr
-end"""
+end""" # Currently, this function is to be replaced by the ones below.
 
 # Generates a tree of depth max_d using grow method given
 # the function set and the terminal set.
@@ -107,13 +107,13 @@ function gen_population(gen::Generator, functionSet::Array{FunctionNode}, termin
     population = Array{Array{Node}}(undef, 0)
     pop_size = getPopSize(gen)
 
-    if getMethod(gen) == "grow"
+    if getMethod(gen) == "grow" # Grow method
         genFunction = rnd_grow_expr
         N = pop_size
-    elseif getMethod(gen) == "full"
+    elseif getMethod(gen) == "full" # Full method
         genFunction = rnd_full_expr
         N = pop_size
-    elseif getMethod(gen) == "RHH"
+    elseif getMethod(gen) == "RHH" # Ramped Half-Half method
         genFunction = rnd_grow_expr
         N = pop_size - pop_size*getFactor(gen)
 

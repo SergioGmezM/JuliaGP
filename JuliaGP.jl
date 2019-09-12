@@ -41,8 +41,10 @@ end
 gen_pop(gp::JuliaGP) = gen_population(gp.generator, gp.functionSet, gp.terminalSet)
 
 # Individual evaluation.
-# The conversion from prefix notation to infix notation will be done using
-# an array of String objects, in order to express priority between operators.
+# This function transforms an array of Nodes to a string maintaining the prefix
+# notation of the original array and adding parentheses in order to express
+# priority. The goal is to transform the array into a string that Julia recognises
+# so that it can be evaluated later by Julia's eval function.
 #
 # First, the individual is read backwards (postfix notation). When a terminal
 # node is encountered, it is added to a stack straight away. When a function

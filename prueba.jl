@@ -32,6 +32,8 @@ gp = JuliaGP(gen, ev) # Creamos el sistema de GP con las herramientas que hemos 
 readFunctions(gp, "functionSet.txt")
 readTerminals(gp, "terminalSet.txt")
 
+# Esto es para comprobar que las funciones y los terminales se han leído bien,
+# imprime todos sus atributos.
 """for op in gp.functionSet
     if getArity(op) == 1
         println("\$(getSymbol(op)) --> \$(eval(op, 2))")
