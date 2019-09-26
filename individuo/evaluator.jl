@@ -18,5 +18,5 @@ struct Evaluator
     fitness::Fitness
     fitnessFunction
 
-    Evaluator(fitness, fitnessFunction) = typeof(fitnessFunction(fitness, "")) == Number ? new(fitness, fitnessFunction) : error("Fitness function must return a numerical value")
+    Evaluator(fitness, fitnessFunction) = typeof(fitnessFunction(fitness, "")) <: Number ? new(fitness, fitnessFunction) : error("Fitness function must return a numerical value")
 end # struct Evaluator
