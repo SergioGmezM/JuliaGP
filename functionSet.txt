@@ -1,0 +1,6 @@
++ + 2 true expr Float64 Float64 Float64
+- - 2 false expr Float64 Float64 Float64
+* * 2 true expr Float64 Float64 Float64
+/ / 2 false expr Float64 Float64 Float64
+sqrt sqrt 1 true expr Float64 Float64
+pow ^ 2 false expr Float64 Float64 Float64
