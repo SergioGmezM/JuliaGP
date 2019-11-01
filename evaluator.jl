@@ -36,5 +36,99 @@ struct Evaluator
     _fitness::Fitness
     _fitnessFunction
 
-    Evaluator(fitness, fitnessFunction) = typeof(fitnessFunction(fitness, "")) <: Number ? new(fitness, fitnessFunction) : error("Fitness function must return a numerical value")
+    Evaluator(fitness, fitnessFunction) = typeof(fitnessFunction(fitness, 0.0)) <: Number ? new(fitness, fitnessFunction) : error("Fitness function must return a numerical value")
 end # struct Evaluator
+
+
+function evaluate(ev::Evaluator, individual::Array{Node})
+
+    stack = Array{String}(undef, 0)
+
+    for node in Iterators.reverse(individual)
+
+        if typeof(node) <: FunctionNode
+
+            operators = Array{String}(undef, 0)
+
+            for i = 1:getArity(node)
+                push!(operators, pop!(stack))
+            end
+
+            temp = "( " * getSymbol(node) * "("
+            for i = 1:(getArity(node) - 1)
+                temp *= operators[i] * ", "
+            end
+            temp *= operators[getArity(node)] * " ))"
+
+            push!(stack, temp)
+
+        elseif typeof(node) <: TerminalNode
+            push!(stack, string(eval(node)))
+
+        end
+    end
+
+    infixInd = pop!(stack)
+
+    ev._fitnessFunction(ev._fitness, Meta.parse(infixInd))
+end
+
+
+# Takes a set of individuals and compares one of their fitness according to its
+# weight, and return the best individual
+function compareFitness(ev::Evaluator, fitnessIndex::Int64, args...)
+
+    best = args[1]
+
+    if sign(getFitnessWeights(ev._fitness, fitnessIndex)) == 1
+
+        for i = 2:length(args)
+            current = args[i]
+
+            if evaluate(ev, current) > evaluate(ev, best)
+                best = current
+            end
+        end
+
+    elseif sign(getFitnessWeights(ev._fitness, fitnessIndex)) == -1
+
+        for i = 2:length(args)
+            current = args[i]
+
+            if evaluate(ev, current) < evaluate(ev, best)
+                best = current
+            end
+        end
+    end
+
+    return best
+end
+
+# Same function as above, but expecting an Array of elements to be compared
+function compareFitness(ev::Evaluator, fitnessIndex::Int64, args::Array{Any})
+
+    best = args[1]
+
+    if sign(getFitnessWeights(ev._fitness, fitnessIndex)) == 1
+
+        for i = 2:length(args)
+            current = args[i]
+
+            if evaluate(ev, current) > evaluate(ev, best)
+                best = current
+            end
+        end
+
+    elseif sign(getFitnessWeights(ev._fitness, fitnessIndex)) == -1
+
+        for i = 2:length(args)
+            current = args[i]
+
+            if evaluate(ev, current) < evaluate(ev, best)
+                best = current
+            end
+        end
+    end
+
+    return best
+end

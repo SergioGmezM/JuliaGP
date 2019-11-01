@@ -1,5 +1,6 @@
 include("initialisation.jl") # For Generator struct.
 include("evaluator.jl") # For Fitness and Evaluator structs.
+include("selector.jl") # For selection method for crossover.
 include("sets.jl") # For setFunctionSet and setTerminalSet.
 include("nodes.jl") # For Node structs.
 
@@ -8,22 +9,33 @@ include("nodes.jl") # For Node structs.
 # specify the tools that the system will be using in order to find the best
 # individual of a population that satisfies a fitness function, also given by
 # the user. These tools include:
-#   generator: the population generator.
-#   evaluator: the evaluator of the individuals' fitnesses.
-#   crossover: the crossover operation between individuals of a population.
-#   mutation: the mutation operation for the individuals of a population.
-#   selector: the way the offspring is going to replace the original population.
-#   functionSet: the set of operations defined by the user.
-#   terminalSet: the set of terminals defined by the user.
+#   _generator: the population generator.
+#   _evaluator: the evaluator of the individuals' fitnesses.
+#   _selector: the way that the population is going to be selected for crossover.
+#   _crossover: the crossover operation between individuals of a population.
+#   _mutation: the mutation operation for the individuals of a population.
+#   _replacer: the way the offspring is going to replace the original population.
+#   _functionSet: the set of operations defined by the user.
+#   _terminalSet: the set of terminals defined by the user.
 struct JuliaGP
     _generator::Generator
     _evaluator::Evaluator
+    _selector::SelectionOperator
     _functionSet::Array{FunctionNode}
     _terminalSet::Array{TerminalNode}
 end # struct JuliaGP
 
-# Constructor for the JuliaGP struct (most likely used).
-JuliaGP(generator::Generator, evaluator::Evaluator) = JuliaGP(generator, evaluator, Array{FunctionNode}(undef, 0), Array{TerminalNode}(undef, 0))
+# Constructors for the JuliaGP struct (most likely used).
+
+function JuliaGP(generator::Generator, evaluator::Evaluator)
+    JuliaGP(generator, evaluator, TournamentSelector(2), Array{FunctionNode}(undef, 0), Array{TerminalNode}(undef, 0))
+end
+
+function JuliaGP(generator::Generator, evaluator::Evaluator, selector::SelectionOperator)
+    JuliaGP(generator, evaluator, selector, Array{FunctionNode}(undef, 0), Array{TerminalNode}(undef, 0))
+end
+
+# -------------------------------------------------------------------------------------------------------
 
 # Setter of the function set of the system.
 function readFunctions(gp::JuliaGP, filename::AbstractString)
@@ -39,6 +51,9 @@ end
 
 # Population generation.
 gen_pop(gp::JuliaGP) = gen_population(gp._generator, gp._functionSet, gp._terminalSet)
+
+# Selects parents for crossover.
+select_parents(gp::JuliaGP, pop::Array{Array{Node}}) = select(gp._selector, pop, gp._evaluator)
 
 # Individual evaluation.
 # This function transforms an array of Nodes to a string maintaining the prefix
@@ -61,35 +76,4 @@ gen_pop(gp::JuliaGP) = gen_population(gp._generator, gp._functionSet, gp._termin
 # from Julia's should be defined in a separate file. When a VariableNode or a
 # NoArgsFunctionNode is encountered, what is put in the final string is its
 # value. So the final string would contain "+(2, 3.2)".
-function evaluate(gp::JuliaGP, individual::Array{Node})
-
-    stack = Array{String}(undef, 0)
-
-    for node in Iterators.reverse(individual)
-
-        if typeof(node) <: FunctionNode
-
-            operators = Array{String}(undef, 0)
-
-            for i = 1:getArity(node)
-                push!(operators, pop!(stack))
-            end
-
-            temp = "( " * getSymbol(node) * "("
-            for i = 1:(getArity(node) - 1)
-                temp *= operators[i] * ", "
-            end
-            temp *= operators[getArity(node)] * " ))"
-
-            push!(stack, temp)
-
-        elseif typeof(node) <: TerminalNode
-            push!(stack, string(eval(node)))
-
-        end
-    end
-
-    infixInd = pop!(stack)
-
-    gp._evaluator._fitnessFunction(gp._evaluator._fitness, infixInd)
-end
+evaluate(gp::JuliaGP, individual::Array{Node}) = evaluate(gp._evaluator, individual)

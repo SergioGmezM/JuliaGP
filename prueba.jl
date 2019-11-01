@@ -5,17 +5,16 @@ include("functions.jl") # Fichero donde se definen las funciones del usuario.
 # Se define la función de fitness que utilizará el sistema
 # la función siempre debe recibir como argumentos el objeto Fitness
 # y un individuo en forma de cadena de caracteres
-function myFunction(fitness::Fitness, individual::String)::Float64
+function myFunction(fitness::Fitness, individual::Union{Expr, Float64, Float32})::Float64
 
     # Para obtener el individuo, se utiliza Meta.parse para pasar de cadena
     # a expresión interpretable por Julia
-    expr = Meta.parse(individual)
     result = Inf
 
     # El fitness se mantendrá en infinito si la expresión es inválida
     try
         # Para obtener el valor de la expresión, se utiliza eval
-        result = abs(eval(expr) - getFitnessValue(fitness, 1)) # en este caso no se me ocurre para qué usar weights
+        result = abs(eval(individual) - getFitnessValue(fitness, 1)) # en este caso no se me ocurre para qué usar weights
     catch
     end
 
@@ -25,8 +24,9 @@ end
 gen = Generator(50, 3, "RHH", 0.6) # Creamos el generador de la población
 fitness = Fitness((50.0,), (-1,)) # Creamos el fitness que utilizará el sistema
 ev = Evaluator(fitness, myFunction) # Creamos el evaluador del sistema con nuestra función de evaluación
+sel = TournamentSelector(2)
 
-gp = JuliaGP(gen, ev) # Creamos el sistema de GP con las herramientas que hemos creado
+gp = JuliaGP(gen, ev, sel) # Creamos el sistema de GP con las herramientas que hemos creado
 
 # Establecemos los conjuntos de funciones y terminales
 readFunctions(gp, "functionSet.txt")
@@ -80,3 +80,24 @@ for node in bestInd
     print("$(getSymbol(node)) ")
 end
 println("\nFitness: $bestFitness")
+
+print("\n\n----------------- PADRES ------------------\n")
+
+selected = select_parents(gp, pop)
+
+for i = 1:2:length(selected)
+    print("Pareja $(Int((i+1)/2)): ")
+    for j = 1:length(pop)
+        if selected[i] == pop[j]
+            print("individuo $j con ")
+
+            for k = 1:length(pop)
+                if selected[i+1] == pop[k]
+                    print("individuo $k\n")
+                    break
+                end
+            end
+            break
+        end
+    end
+end
