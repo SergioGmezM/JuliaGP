@@ -16,10 +16,10 @@ include("nodes.jl") # For Node structs.
 #   functionSet: the set of operations defined by the user.
 #   terminalSet: the set of terminals defined by the user.
 struct JuliaGP
-    generator::Generator
-    evaluator::Evaluator
-    functionSet::Array{FunctionNode}
-    terminalSet::Array{TerminalNode}
+    _generator::Generator
+    _evaluator::Evaluator
+    _functionSet::Array{FunctionNode}
+    _terminalSet::Array{TerminalNode}
 end # struct JuliaGP
 
 # Constructor for the JuliaGP struct (most likely used).
@@ -28,17 +28,17 @@ JuliaGP(generator::Generator, evaluator::Evaluator) = JuliaGP(generator, evaluat
 # Setter of the function set of the system.
 function readFunctions(gp::JuliaGP, filename::AbstractString)
     functions = setFunctionSet(filename)
-    copy!(gp.functionSet, functions)
+    copy!(gp._functionSet, functions)
 end
 
 # Setter of the terminal set of the system.
 function readTerminals(gp::JuliaGP, filename::AbstractString)
     terminals = setTerminalSet(filename)
-    copy!(gp.terminalSet, terminals)
+    copy!(gp._terminalSet, terminals)
 end
 
 # Population generation.
-gen_pop(gp::JuliaGP) = gen_population(gp.generator, gp.functionSet, gp.terminalSet)
+gen_pop(gp::JuliaGP) = gen_population(gp._generator, gp._functionSet, gp._terminalSet)
 
 # Individual evaluation.
 # This function transforms an array of Nodes to a string maintaining the prefix
@@ -91,5 +91,5 @@ function evaluate(gp::JuliaGP, individual::Array{Node})
 
     infixInd = pop!(stack)
 
-    gp.evaluator.fitnessFunction(gp.evaluator.fitness, infixInd)
+    gp._evaluator._fitnessFunction(gp._evaluator._fitness, infixInd)
 end

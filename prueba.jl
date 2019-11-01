@@ -15,7 +15,7 @@ function myFunction(fitness::Fitness, individual::String)::Float64
     # El fitness se mantendrá en infinito si la expresión es inválida
     try
         # Para obtener el valor de la expresión, se utiliza eval
-        result = abs(eval(expr) - fitness.values[1]) # en este caso no se me ocurre para qué usar weights
+        result = abs(eval(expr) - getFitnessValue(fitness, 1)) # en este caso no se me ocurre para qué usar weights
     catch
     end
 

@@ -8,10 +8,10 @@ include("nodes.jl") # For Node structs.
 #   pertentage of trees generated using full method, 1-RHH_factor will be the
 #   percentage of trees generated using grow method.
 struct Generator
-    pop_size::Int
-    max_d::Int
-    method::String
-    RHH_factor::Float64
+    _pop_size::Int
+    _max_d::Int
+    _method::String
+    _RHH_factor::Float64
 
     function Generator(pop_size, max_d, method, RHH_factor)
         if pop_size > 0 && max_d >= 0 && (method == "full" || method == "grow" || method == "RHH") && 0 <= RHH_factor <= 1
@@ -26,16 +26,16 @@ end # struct Generator
 Generator(pop_size, max_d, method) = Generator(pop_size, max_d, method, 0.5)
 
 # Gets the population size.
-getPopSize(gen::Generator) = gen.pop_size
+getPopSize(gen::Generator) = gen._pop_size
 
 # Gets the maximun depth of the individuals
-getMaxDepth(gen::Generator) = gen.max_d
+getMaxDepth(gen::Generator) = gen._max_d
 
 # Gets the method used for individuals initialisation.
-getMethod(gen::Generator) = gen.method
+getMethod(gen::Generator) = gen._method
 
 # Gets the percentage of trees generated usign full method.
-getFactor(gen::Generator) = gen.RHH_factor
+getFactor(gen::Generator) = gen._RHH_factor
 
 # Generates a tree of depth max_d using either full or grow methods given
 # the function set and the terminal set.
